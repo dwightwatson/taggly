@@ -1,0 +1,22 @@
+{
+    "name": "watson/taggly",
+    "keywords": ["taggly", "laravel", "tag", "cloud"],
+    "license": "MIT",
+    "description": "A modern port of the old CodeIgniter Taggly library.",
+    "authors": [
+        {
+            "name": "Dwight Watson",
+            "email": "dwight@studiousapp.com"
+        }
+    ],
+    "require": {
+        "php": ">=5.4.0",
+        "illuminate/support": "4.2.*"
+    },
+    "autoload": {
+        "psr-4": {
+            "Watson\\Taggly\\": "src/"
+        }
+    },
+    "minimum-stability": "stable"
+}

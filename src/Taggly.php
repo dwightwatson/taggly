@@ -51,10 +51,10 @@ class Taggly {
      */
     public function getTags()
     {
-        return is_array($this->tags) ? $this->tags : array();
+        return is_array($this->tags) ? $this->tags : [];
     }
 
-    public function setTags(array $tags = array())
+    public function setTags(array $tags = [])
     {
         $this->tags = [];
 
@@ -198,7 +198,7 @@ class Taggly {
     {
         if ($tags) $this->setTags($tags);
 
-        $tags = $this->getTags() ?: array();
+        $tags = $this->getTags() ?: [];
 
         $output = '';
 

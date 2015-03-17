@@ -28,7 +28,7 @@ class TagglyServiceProvider extends ServiceProvider {
 	 */
 	public function provides()
 	{
-		return array('tag');
+		return ['tag'];
 	}
 
 }

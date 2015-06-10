@@ -240,7 +240,7 @@ class Taggly {
                 .'style="font-size: '.floor($fontSize).'px">'.e($tag->getTag()).'</a>';
         }
 
-        return '<span class="tag" title="'.$tag->getTag().'"> style="font-size: '
+        return '<span class="tag" title="'.$tag->getTag().'" style="font-size: '
             .floor($fontSize).'px">'.e($tag->getTag()).'</span>';
     }
 

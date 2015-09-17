@@ -25,6 +25,32 @@ And under aliases:
 'Tag' => 'Watson\Taggly\TagFacade',
 ```
 
+## Usage
+
+First you must add the service provider to to `config/app.php` under `providers`
+
+```
+    Watson\Taggly\TagglyServiceProvider::class
+```
+
+And under aliases:
+
+```
+'Tag' => 'Watson\Taggly\TagFacade',
+```
+
+Now you must publish the assets:
+
+```
+    php artisan vendor:publish
+```
+
+You can specify the connection in the corcel config file.
+
+    config/taggly.php
+
+
+
 ## Overview
 
 First, let's look at what makes up a tag in Taggly. A tag is made up of 3 things:

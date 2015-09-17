@@ -31,4 +31,16 @@ class TagglyServiceProvider extends ServiceProvider {
 		return ['tag'];
 	}
 
+	/**
+	 * Perform post-registration booting of services.
+	 *
+	 * @return void
+	 */
+	public function boot()
+	{
+	    $this->publishes([
+	        __DIR__.'/../config/taggly.php' => config_path('taggly.php'),
+	    ]);
+	}
+
 }

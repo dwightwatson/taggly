@@ -4,9 +4,9 @@ class Tag {
 
     /**
      * The tag.
-     * 
+     *
      * @var string
-     */    
+     */
     protected $tag;
 
     /**

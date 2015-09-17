@@ -45,7 +45,7 @@ Now you must publish the assets:
 php artisan vendor:publish
 ```
 
-You can specify the connection in the corcel config file.
+You can specify the connection in the taggly config file.
 
     config/taggly.php
 

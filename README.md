@@ -30,7 +30,7 @@ And under aliases:
 First you must add the service provider to to `config/app.php` under `providers`
 
 ```
-    Watson\Taggly\TagglyServiceProvider::class
+Watson\Taggly\TagglyServiceProvider::class
 ```
 
 And under aliases:
@@ -42,7 +42,7 @@ And under aliases:
 Now you must publish the assets:
 
 ```
-    php artisan vendor:publish
+php artisan vendor:publish
 ```
 
 You can specify the connection in the corcel config file.

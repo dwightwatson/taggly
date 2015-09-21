@@ -1,7 +1,7 @@
-<?php
-namespaceWatsonTaggly;
-class Taggly
-{
+<?php namespace Watson\Taggly;
+
+
+class Taggly {
 
 	/**
      * The tags for the cloud.

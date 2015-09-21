@@ -9,7 +9,7 @@ return [
 	*    max: 24
 	*
 	*/
-	'fontSize' => [
+	'font_size' => [
 		'max' => null,
 		'min' => null,
 	],
@@ -22,7 +22,7 @@ return [
 	*
 	*/
 
-	'fontUnit' => '',
+	'font_unit' => '',
 
 	/**
 	*
@@ -31,7 +31,7 @@ return [
 	*
 	**/
 
-	'addSpaces' => null,
+	'add_spaces' => null,
 
 	/**
 	*
@@ -40,7 +40,7 @@ return [
 	*
 	**/
 
-	'shuffleTags' => null,
+	'shuffle_tags' => null,
 
 ];
 

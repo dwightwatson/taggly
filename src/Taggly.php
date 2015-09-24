@@ -228,7 +228,7 @@ class Taggly {
      */
     public function setMinimumFontSize($value)
     {
-        $this->minimumFontSize = (int)$value;
+        $this->minimumFontSize = $value;
     }
 
     /**
@@ -249,7 +249,7 @@ class Taggly {
      */
     public function setMaximumFontSize($value)
     {
-        $this->maximumFontSize = (int)$value;
+        $this->maximumFontSize = $value;
     }
 
     /**

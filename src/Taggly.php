@@ -64,14 +64,14 @@ class Taggly {
         /**
          * Add Laravel 5 Config
          */
-        if ((int)config('taggly.font_size.max'))
+        if (is_numeric(config('taggly.font_size.max')))
         {
-            $this->setMaximumFontSize((int)config('taggly.font_size.max'));
+            $this->setMaximumFontSize(config('taggly.font_size.max'));
         }
 
-        if ((int)config('taggly.font_size.min'))
+        if (is_numeric(config('taggly.font_size.min')))
         {
-            $this->setMinimumFontSize((int)config('taggly.font_size.min'));
+            $this->setMinimumFontSize(config('taggly.font_size.min'));
         }
 
         if ((string)config('taggly.font_unit'))

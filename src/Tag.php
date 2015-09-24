@@ -30,7 +30,7 @@ class Tag {
      * @param  array  $tag
      * @return void
      */
-    public function __construct(array $tag = null, $count = null, $url = null)
+    public function __construct(array $tag = null, $config = [], $count = null, $url = null)
     {
         if (is_array($tag))
         {

@@ -59,6 +59,21 @@ class Taggly {
      */
     protected $shuffleTags = true;
 
+    /**
+     * output style/type
+     *
+     * @var string
+     */
+    protected $htmlTags = [
+    		'parent' => [
+    			'name' => 'div',
+    			'attributes' => [
+    				'class' => 'tags'
+    			]
+    		],
+    		'child' => []
+    ];
+
     public function __construct()
     {
         /**
@@ -280,18 +295,53 @@ class Taggly {
      * @param  array  $tags
      * @return string
      */
-    public function cloud(array $tags = null)
+    public function cloud(array $tags = null, array $config = [])
     {
-        if ($tags) $this->setTags($tags);
+
+    	if(isset($config['htmlTags']) && !empty($config['htmlTags']) && count($config['htmlTags'])){
+    		$this->htmlTags = array_replace_recursive ($this->htmlTags, $config['htmlTags']);
+    	}
+
+        if ($tags)
+        {
+        	$this->setTags($tags);
+        }
+
         $tags = $this->getTags() ? : [];
+
         $output = '';
-        if ($this->getShuffleTags()) shuffle($tags);
+        $endString = '';
+
+        /* set parent html tag */
+        if(isset($this->htmlTags['parent']['name']) && !empty($this->htmlTags['parent']['name']))
+        {
+        	/* add attributes  */
+        	$attributes = '';
+        	if(isset($this->htmlTags['parent']['attributes']) && !empty($this->htmlTags['parent']['attributes']))
+        	{
+        		$attributes = $this->htmlTags['parent']['attributes'];
+        		array_walk($attributes, function (&$value, $key){
+        			$value = $key.'="'.$value.'"';
+        		});
+
+        		$attributes = implode(' ', $attributes);
+        	}
+
+        	$output .= '<'.$this->htmlTags['parent']['name'].' '.$attributes.'>';
+        	$endString = '</'.$this->htmlTags['parent']['name'].'>';
+        }
+
+        if ($this->getShuffleTags())
+        {
+        	shuffle($tags);
+        }
+
         foreach($tags as $tag)
         {
             $output.= $this->getTagElement($tag);
         }
 
-        return '<div class="tags">' . $output . '</div>';
+        return $output.$endString;
     }
 
     /**
@@ -316,20 +366,42 @@ class Taggly {
     {
         $fontSize = $this->getFontSize($tag);
         $tagString = '';
+
+   		 /* set parent html tag */
+        if(isset($this->htmlTags['child']['name']) && !empty($this->htmlTags['child']['name']))
+        {
+
+        	/* add attributes  */
+        	$attributes = '';
+        	if(isset($this->htmlTags['child']['attributes']) && !empty($this->htmlTags['child']['attributes']))
+        	{
+        		$attributes = $this->htmlTags['child']['attributes'];
+        		array_walk($attributes, function (&$value, $key){
+        			$value = $key.'="'.$value.'"';
+        		});
+
+        		$attributes = implode(' ', $attributes);
+        	}
+
+
+        	$tagString .= '<'.$this->htmlTags['child']['name'].' '.$attributes.'>';
+        	$endString = '</'.$this->htmlTags['child']['name'].'>';
+        }
+
         if ($tag->getUrl())
         {
-            $tagString = '<a href="' . $tag->getUrl() . '" class="tag" title="' . $tag->getTag() . '" ' . 'style="font-size: ' . $fontSize . $this->getFontUnit() . '">' . e($tag->getTag()) . '</a>';
+            $tagString .= '<a href="' . $tag->getUrl() . '" class="tag" title="' . $tag->getTag() . '" ' . 'style="font-size: ' . $fontSize . $this->getFontUnit() . '">' . e($tag->getTag()) . '</a>';
         }
         else
         {
-            $tagString = '<span class="tag" title="' . $tag->getTag() . '" style="font-size: ' . $fontSize . $this->getFontUnit() . '">' . e($tag->getTag()) . '</span>';
+            $tagString .= '<span class="tag" title="' . $tag->getTag() . '" style="font-size: ' . $fontSize . $this->getFontUnit() . '">' . e($tag->getTag()) . '</span>';
         }
 
         if ($this->getAddSpace())
         {
-            $tagString.= ' ';
+            $tagString .= ' ';
         }
 
-        return $tagString;
+        return $tagString.$endString;
     }
 }

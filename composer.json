@@ -1,5 +1,5 @@
 {
-    "name": "watson/taggly",
+    "name": "redbeed/taggly",
     "keywords": ["taggly", "laravel", "tag", "cloud"],
     "license": "MIT",
     "description": "A modern port of the old CodeIgniter Taggly library.",

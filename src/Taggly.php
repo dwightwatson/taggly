@@ -24,6 +24,13 @@ class Taggly {
      */
     protected $maximumCount;
 
+     /**
+     * The font class
+     *
+     * @var int
+     */
+    protected $fontClass;
+
     /**
      * The minimum font size.
      *
@@ -84,9 +91,14 @@ class Taggly {
             $this->setMaximumFontSize(config('taggly.font_size.max'));
         }
 
-        if (is_numeric(config('taggly.font_size.min')))
+    	if (is_numeric(config('taggly.font_size.min')))
         {
             $this->setMinimumFontSize(config('taggly.font_size.min'));
+        }
+
+    	if (is_array(config('taggly.font_size.class')) && count(config('taggly.font_size.class')))
+        {
+            $this->setFontClass(config('taggly.font_size.class'));
         }
 
         if ((string)config('taggly.font_unit'))
@@ -103,6 +115,11 @@ class Taggly {
         {
             $this->setShuffleTags((bool)config('taggly.shuffleTags'));
         }
+
+        if (is_array(config('taggly.html_tags')) && count(config('taggly.html_tags')) && !empty(config('taggly.html_tags')))
+        {
+    		$this->setHtmlTags(array_replace_recursive ($this->htmlTags, config('taggly.html_tags')));
+    	}
     }
 
     /**
@@ -246,6 +263,27 @@ class Taggly {
         $this->minimumFontSize = $value;
     }
 
+	/**
+     * Get the minimum font size.
+     *
+     * @return int
+     */
+    public function getFontClass()
+    {
+        return $this->fontClass;
+    }
+
+    /**
+     * Set the minimum font size.
+     *
+     * @param  int  $value
+     * @return void
+     */
+    public function setFontClass($fontClass)
+    {
+        $this->fontClass = $fontClass;
+    }
+
     /**
      * Get the maximum font size.
      *
@@ -288,6 +326,27 @@ class Taggly {
         $this->shuffleTags = (bool)$value;
     }
 
+	/**
+     * Get whether the tags are being shuffled.
+     *
+     * @return bool
+     */
+    public function getHtmlTags()
+    {
+        return $this->htmlTags;
+    }
+
+    /**
+     * Set whether the tags are being shuffled.
+     *
+     * @param  bool  $value
+     * @return void
+     */
+    public function setHtmlTags($htmlTags)
+    {
+        $this->htmlTags = $htmlTags;
+    }
+
     /**
      * Generate a tag cloud using either the tags provided or tags
      * that have already been registered.
@@ -298,8 +357,8 @@ class Taggly {
     public function cloud(array $tags = null, array $config = [])
     {
 
-    	if(isset($config['htmlTags']) && !empty($config['htmlTags']) && count($config['htmlTags'])){
-    		$this->htmlTags = array_replace_recursive ($this->htmlTags, $config['htmlTags']);
+    	if(isset($config['html_tags']) && !empty($config['html_tags']) && count($config['html_tags'])){
+    		$this->htmlTags = array_replace_recursive ($this->htmlTags, $config['html_tags']);
     	}
 
         if ($tags)
@@ -352,8 +411,23 @@ class Taggly {
      */
     public function getFontSize(Tag $tag)
     {
-        $fontSize = ($tag->getCount() / $this->getMaximumCount()) * ($this->getMaximumFontSize() - $this->getMinimumFontSize()) + $this->getMinimumFontSize();
-        return $this->getFontUnit() == 'px' ? floor($fontSize) : round($fontSize, 2);
+    	if(is_array($this->fontClass) && count($this->fontClass))
+    	{
+    		$fontSize = (int)(($tag->getCount() / $this->getMaximumCount()) * (count($this->fontClass) - 1));
+    		$fontClass = $this->fontClass[$fontSize];
+    		return [
+    				'class' => $fontClass,
+    				'style' => '',
+    		];
+    	}
+    	else
+    	{
+    		$fontSize = ($tag->getCount() / $this->getMaximumCount()) * ($this->getMaximumFontSize() - $this->getMinimumFontSize()) + $this->getMinimumFontSize();
+        	return [
+    				'class' => '',
+    				'style' => $this->getFontUnit() == 'px' ? floor($fontSize) : round($fontSize, 2).$this->getFontUnit(),
+    		];
+    	}
     }
 
     /**
@@ -365,22 +439,34 @@ class Taggly {
     public function getTagElement(Tag $tag)
     {
         $fontSize = $this->getFontSize($tag);
+
         $tagString = '';
+        $endString = '';
+        $attributes = '';
+
+        $setClass = true;
 
    		 /* set parent html tag */
         if(isset($this->htmlTags['child']['name']) && !empty($this->htmlTags['child']['name']))
         {
 
         	/* add attributes  */
-        	$attributes = '';
         	if(isset($this->htmlTags['child']['attributes']) && !empty($this->htmlTags['child']['attributes']))
         	{
         		$attributes = $this->htmlTags['child']['attributes'];
-        		array_walk($attributes, function (&$value, $key){
+        		array_walk($attributes, function (&$value, $key) use ($fontSize) {
+        			if($key == 'class'){
+        				$setClass = false;
+        				$value .= ' '.$fontSize['class'];
+        			}
         			$value = $key.'="'.$value.'"';
         		});
 
         		$attributes = implode(' ', $attributes);
+        	}
+
+        	if($setClass == true){
+        		$attributes .= ' class="'.$fontSize['class'].'" ';
         	}
 
 
@@ -390,11 +476,11 @@ class Taggly {
 
         if ($tag->getUrl())
         {
-            $tagString .= '<a href="' . $tag->getUrl() . '" class="tag" title="' . $tag->getTag() . '" ' . 'style="font-size: ' . $fontSize . $this->getFontUnit() . '">' . e($tag->getTag()) . '</a>';
+            $tagString .= '<a href="' . $tag->getUrl() . '" title="' . $tag->getTag() . '" ' . $fontSize['style'].' ><span>' . e($tag->getTag()) . '</span></a>';
         }
         else
         {
-            $tagString .= '<span class="tag" title="' . $tag->getTag() . '" style="font-size: ' . $fontSize . $this->getFontUnit() . '">' . e($tag->getTag()) . '</span>';
+            $tagString .= '<span title="' . $tag->getTag() . '" ' . $fontSize['style'].' >' . e($tag->getTag()) . '</span>';
         }
 
         if ($this->getAddSpace())

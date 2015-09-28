@@ -8,10 +8,33 @@ return [
 	*    min: 12
 	*    max: 24
 	*
+	*
 	*/
 	'font_size' => [
+
 		'max' => null,
 		'min' => null,
+
+		/**
+		 *
+		 * or you can use class to
+		 * set size of the childs+
+		 *
+		 * if you set class font.max, font.min and
+		 * font_unit are ignore
+		 *
+		 *	Example:
+		 *
+		 * 	'class' => [
+		 *
+		 * 		'0' => 'tag-1',
+		 * 		'1' => 'tag-2',
+		 * 		'2' => 'tag-3',
+		 * 		'3' => 'tag-4',
+		 * 		'4' => 'tag-5',
+		 * 	]
+		 *
+		*/
 	],
 
 	/**
@@ -41,6 +64,22 @@ return [
 	**/
 
 	'shuffle_tags' => null,
+
+	/**
+	 *
+	 * set HTML Tags & class
+	 *
+	 */
+
+	'html_tags' => [
+    	'parent' => [
+    		'name' => 'div',
+    		'attributes' => [
+    			'class' => 'tags'
+    		]
+    	],
+    	'child' => []
+	],
 
 ];
 

@@ -11,6 +11,20 @@ class Taggly {
     protected $tags;
 
     /**
+     *  Array Result from tagSize
+     *
+     * @var array
+     */
+    protected $sizes = array();
+
+    /**
+     * Tag usage less than the threshold is excluded from
+     *
+     * @var int
+     */
+    protected $threshold;
+
+    /**
      * The minimum tag count.
      *
      * @var int
@@ -43,7 +57,7 @@ class Taggly {
      *
      * @var int
      */
-    protected $maximumFontSize = 24;
+    protected $maximumFontSize = 50;
 
     /**
      * font unit.
@@ -120,6 +134,10 @@ class Taggly {
         {
     		$this->setHtmlTags(array_replace_recursive ($this->htmlTags, config('taggly.html_tags')));
     	}
+        if (is_numeric(config('threshold')) && !empty(config('threshold')))
+        {
+            $this->setThreshold(config('threshold'));
+        }
     }
 
     /**
@@ -170,7 +188,7 @@ class Taggly {
             return $tag->getCount();
         }
 
-        , $tags);
+        , $this->tags);
         $minCount = min($counts);
         return $minCount;
     }
@@ -195,6 +213,39 @@ class Taggly {
         $this->addSpace = (bool)$addSpace;
         return $this->addSpace;
     }
+
+    /**
+     * @return array
+     */
+    public function getSizes()
+    {
+        return $this->sizes;
+    }
+
+    /**
+     * @param array $sizes
+     */
+    public function setSizes($sizes)
+    {
+        $this->sizes = $sizes;
+    }
+
+    /**
+     * @return int
+     */
+    public function getThreshold()
+    {
+        return $this->threshold;
+    }
+
+    /**
+     * @param int $threshold
+     */
+    public function setThreshold($threshold)
+    {
+        $this->threshold = $threshold;
+    }
+
 
     /**
      * Get the highest count of the tags.
@@ -347,6 +398,45 @@ class Taggly {
         $this->htmlTags = $htmlTags;
     }
 
+    public function tagSizes($tags, $threshold=0, $maxsize, $minsize) {
+        //ref: http://dburke.info/blog/logarithmic-tag-clouds/
+
+        /* usage:
+            $tags -an array of tags and their corresponding counts
+                   format: $tags = array(
+                                         array('tag'   => tagname,
+                                               'count' => tagcount),
+                                   );
+            $threshold -Tag usage less than the threshold is excluded from
+                being displayed.  A value of 0 displays all tags.
+            -maxsize: max desired CSS font-size in em units
+            -minsize: min desired CSS font-size in em units
+           Returns an array of the tag, its count and calculated font size.
+        **/
+        $counts = $tagcount = $tagcloud = array();
+        foreach($tags as $tag) {
+            if($tag['count'] >= $threshold) {
+
+                $tagcount += array($tag['tag'] => $tag['count']);
+            }
+        }
+        $maxcount = $this->getMaximumCount();
+        $mincount = $this->getMinimumCount();
+        $constant = log($maxcount - ($mincount - 1))/(($maxsize - $minsize)==0 ? 1 : ($maxsize - $minsize));
+        foreach($tagcount as $tag => $count) {
+            $size = log($count - ($mincount - 1)) / $constant + $minsize;
+
+            if((is_array($this->fontClass) && count($this->fontClass)) || $this->getFontUnit() == 'px') {
+                $tagcloud[] = array('tag' => $tag, 'count' => $count, 'size' => round($size, 0));
+            }
+            else{
+                $tagcloud[] = array('tag' => $tag, 'count' => $count, 'size' => round($size, 2));
+            }
+        }
+        return $tagcloud;
+    }
+
+
     /**
      * Generate a tag cloud using either the tags provided or tags
      * that have already been registered.
@@ -356,16 +446,23 @@ class Taggly {
      */
     public function cloud(array $tags = null, array $config = [])
     {
-
     	if(isset($config['html_tags']) && !empty($config['html_tags']) && count($config['html_tags'])){
     		$this->htmlTags = array_replace_recursive ($this->htmlTags, $config['html_tags']);
     	}
 
-        if ($tags)
-        {
+        if(isset($config['threshold']) && !empty($config['threshold']) ){
+            $this->threshold = $config['threshold'];
+        }
+        if ($tags){
         	$this->setTags($tags);
         }
+        if(is_array($this->fontClass) && count($this->fontClass)) {
 
+            $this->sizes = $this->tagSizes($tags, $this->threshold, (count($this->fontClass) - 1), 0);
+        }
+        else{
+            $this->sizes = $this->tagSizes($tags, $this->threshold, $this->getMaximumFontSize(), $this->getMinimumFontSize());
+        }
         $tags = $this->getTags() ? : [];
 
         $output = '';
@@ -389,19 +486,18 @@ class Taggly {
         	$output .= '<'.$this->htmlTags['parent']['name'].' '.$attributes.'>';
         	$endString = '</'.$this->htmlTags['parent']['name'].'>';
         }
-
-        if ($this->getShuffleTags())
-        {
+        if ($this->getShuffleTags()){
         	shuffle($tags);
         }
 
-        foreach($tags as $tag)
-        {
+        foreach($tags as $tag){
+
             $output.= $this->getTagElement($tag);
         }
 
         return $output.$endString;
     }
+
 
     /**
      * Get the font size in units for a given tag.
@@ -409,11 +505,19 @@ class Taggly {
      * @param  Tag  $tag
      * @return int
      */
-    public function getFontSize(Tag $tag)
-    {
-    	if(is_array($this->fontClass) && count($this->fontClass))
+    public function getFontSize(Tag $tag)    {
+
+        if(is_array($this->fontClass) && count($this->fontClass))
     	{
-    		$fontSize = (int)(($tag->getCount() / $this->getMaximumCount()) * (count($this->fontClass) - 1));
+
+            $fontSize = 0;
+            foreach($this->sizes as $size) {
+
+               if($tag->getTag() == $size['tag']){
+
+                   $fontSize = $size['size'];
+               }
+            }
     		$fontClass = $this->fontClass[$fontSize];
     		return [
     				'class' => $fontClass,
@@ -422,11 +526,30 @@ class Taggly {
     	}
     	else
     	{
-    		$fontSize = ($tag->getCount() / $this->getMaximumCount()) * ($this->getMaximumFontSize() - $this->getMinimumFontSize()) + $this->getMinimumFontSize();
-        	return [
+
+            $fontSize = 0;
+            foreach($this->sizes as $size) {
+
+                if($tag->getTag() == $size['tag']){
+
+                    $fontSize = $size['size'];
+
+                    if($fontSize > $this->getMaximumFontSize()){
+
+                        $fontSize = $this->getMaximumFontSize();
+                    }
+                    if($fontSize < $this->getMinimumFontSize()){
+
+                        $fontSize = $this->getMaximumFontSize();
+                    }
+                }
+            }
+
+            return [
     				'class' => '',
-    				'style' => $this->getFontUnit() == 'px' ? floor($fontSize) : round($fontSize, 2).$this->getFontUnit(),
-    		];
+    				//'style' => 'font-size:'.($this->getFontUnit() == 'px' ? floor($fontSize) : round($fontSize, 2).$this->getFontUnit()),
+                'style' => 'font-size:'.$fontSize.$this->getFontUnit()
+            ];
     	}
     }
 
@@ -439,7 +562,6 @@ class Taggly {
     public function getTagElement(Tag $tag)
     {
         $fontSize = $this->getFontSize($tag);
-
         $tagString = '';
         $endString = '';
         $attributes = '';
@@ -476,11 +598,11 @@ class Taggly {
 
         if ($tag->getUrl())
         {
-            $tagString .= '<a href="' . $tag->getUrl() . '" title="' . $tag->getTag() . '" ' . $fontSize['style'].' ><span>' . e($tag->getTag()) . '</span></a>';
+            $tagString .= '<a href="' . $tag->getUrl() . '" title="' . $tag->getTag() . '" style="' . $fontSize['style'].'"" ><span>' . e($tag->getTag()) . '</span></a>';
         }
         else
         {
-            $tagString .= '<span title="' . $tag->getTag() . '" ' . $fontSize['style'].' >' . e($tag->getTag()) . '</span>';
+            $tagString .= '<span title="' . $tag->getTag() . '" style="' . $fontSize['style'].'" >' . e($tag->getTag()) . '</span>';
         }
 
         if ($this->getAddSpace())

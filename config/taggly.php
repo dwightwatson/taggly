@@ -81,6 +81,12 @@ return [
     	'child' => []
 	],
 
-];
+	/**
+	 *
+	 * set  threshold - Tag usage less than the threshold is excluded from
+	 *
+	 */
 
+	'threshold' => 0,
+];
 ?>

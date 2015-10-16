@@ -420,11 +420,14 @@ class Taggly {
                 $tagcount += array($tag['tag'] => $tag['count']);
             }
         }
+
+
         $maxcount = $this->getMaximumCount();
         $mincount = $this->getMinimumCount();
         $constant = log($maxcount - ($mincount - 1))/(($maxsize - $minsize)==0 ? 1 : ($maxsize - $minsize));
         foreach($tagcount as $tag => $count) {
-            $size = log($count - ($mincount - 1)) / $constant + $minsize;
+
+            $size = log($count - ($mincount - 1)) / (($constant + $minsize) == 0 ? 1 : ($maxsize - $minsize));
 
             if((is_array($this->fontClass) && count($this->fontClass)) || $this->getFontUnit() == 'px') {
                 $tagcloud[] = array('tag' => $tag, 'count' => $count, 'size' => round($size, 0));
@@ -446,56 +449,56 @@ class Taggly {
      */
     public function cloud(array $tags = null, array $config = [])
     {
-    	if(isset($config['html_tags']) && !empty($config['html_tags']) && count($config['html_tags'])){
-    		$this->htmlTags = array_replace_recursive ($this->htmlTags, $config['html_tags']);
-    	}
+        if(count($tags) != 0) {
 
-        if(isset($config['threshold']) && !empty($config['threshold']) ){
-            $this->threshold = $config['threshold'];
+            if (isset($config['html_tags']) && !empty($config['html_tags']) && count($config['html_tags'])) {
+                $this->htmlTags = array_replace_recursive($this->htmlTags, $config['html_tags']);
+            }
+
+            if (isset($config['threshold']) && !empty($config['threshold'])) {
+                $this->threshold = $config['threshold'];
+            }
+            if ($tags) {
+                $this->setTags($tags);
+            }
+            if (is_array($this->fontClass) && count($this->fontClass)) {
+
+                $this->sizes = $this->tagSizes($tags, $this->threshold, (count($this->fontClass) - 1), 0);
+            } else {
+                $this->sizes = $this->tagSizes($tags, $this->threshold, $this->getMaximumFontSize(), $this->getMinimumFontSize());
+            }
+            $tags = $this->getTags() ?: [];
+
+            $output = '';
+            $endString = '';
+
+            /* set parent html tag */
+            if (isset($this->htmlTags['parent']['name']) && !empty($this->htmlTags['parent']['name'])) {
+                /* add attributes  */
+                $attributes = '';
+                if (isset($this->htmlTags['parent']['attributes']) && !empty($this->htmlTags['parent']['attributes'])) {
+                    $attributes = $this->htmlTags['parent']['attributes'];
+                    array_walk($attributes, function (&$value, $key) {
+                        $value = $key . '="' . $value . '"';
+                    });
+
+                    $attributes = implode(' ', $attributes);
+                }
+
+                $output .= '<' . $this->htmlTags['parent']['name'] . ' ' . $attributes . '>';
+                $endString = '</' . $this->htmlTags['parent']['name'] . '>';
+            }
+            if ($this->getShuffleTags()) {
+                shuffle($tags);
+            }
+
+            foreach ($tags as $tag) {
+
+                $output .= $this->getTagElement($tag);
+            }
+
+            return $output . $endString;
         }
-        if ($tags){
-        	$this->setTags($tags);
-        }
-        if(is_array($this->fontClass) && count($this->fontClass)) {
-
-            $this->sizes = $this->tagSizes($tags, $this->threshold, (count($this->fontClass) - 1), 0);
-        }
-        else{
-            $this->sizes = $this->tagSizes($tags, $this->threshold, $this->getMaximumFontSize(), $this->getMinimumFontSize());
-        }
-        $tags = $this->getTags() ? : [];
-
-        $output = '';
-        $endString = '';
-
-        /* set parent html tag */
-        if(isset($this->htmlTags['parent']['name']) && !empty($this->htmlTags['parent']['name']))
-        {
-        	/* add attributes  */
-        	$attributes = '';
-        	if(isset($this->htmlTags['parent']['attributes']) && !empty($this->htmlTags['parent']['attributes']))
-        	{
-        		$attributes = $this->htmlTags['parent']['attributes'];
-        		array_walk($attributes, function (&$value, $key){
-        			$value = $key.'="'.$value.'"';
-        		});
-
-        		$attributes = implode(' ', $attributes);
-        	}
-
-        	$output .= '<'.$this->htmlTags['parent']['name'].' '.$attributes.'>';
-        	$endString = '</'.$this->htmlTags['parent']['name'].'>';
-        }
-        if ($this->getShuffleTags()){
-        	shuffle($tags);
-        }
-
-        foreach($tags as $tag){
-
-            $output.= $this->getTagElement($tag);
-        }
-
-        return $output.$endString;
     }
 
 

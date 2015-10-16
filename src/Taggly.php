@@ -449,6 +449,14 @@ class Taggly {
      */
     public function cloud(array $tags = null, array $config = [])
     {
+        foreach($tags as $key => $value){
+
+            if(!isset($value['tag']) || (!isset($value['count']) || !is_numeric($value['count']))){
+
+                unset($tags[$key]);
+            }
+        }
+
         if(count($tags) != 0) {
 
             if (isset($config['html_tags']) && !empty($config['html_tags']) && count($config['html_tags'])) {

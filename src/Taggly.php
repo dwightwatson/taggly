@@ -122,7 +122,7 @@ class Taggly {
 
         if (config('taggly.add_spaces') === false || config('taggly.add_spaces') === true)
         {
-            $this->setAddSpace((bool)config('taggly.addSpaces'));
+            $this->setAddSpace((bool)config('taggly.add_spaces'));
         }
 
         if (config('taggly.shuffle_tags') === false || config('taggly.shuffle_tags') === true)
@@ -427,7 +427,7 @@ class Taggly {
         $constant = log($maxcount - ($mincount - 1))/(($maxsize - $minsize)==0 ? 1 : ($maxsize - $minsize));
         foreach($tagcount as $tag => $count) {
 
-            $size = log($count - ($mincount - 1)) / (($constant + $minsize) == 0 ? 1 : ($maxsize - $minsize));
+            $size = log($count - ($mincount - 1)) / (($constant) == 0 ? 1 : ($constant)) + $minsize;
 
             if((is_array($this->fontClass) && count($this->fontClass)) || $this->getFontUnit() == 'px') {
                 $tagcloud[] = array('tag' => $tag, 'count' => $count, 'size' => round($size, 0));
@@ -573,6 +573,7 @@ class Taggly {
     public function getTagElement(Tag $tag)
     {
         $fontSize = $this->getFontSize($tag);
+        var_dump($fontSize);
         $tagString = '';
         $endString = '';
         $attributes = '';

@@ -609,7 +609,7 @@ class Taggly {
 
         if ($tag->getUrl())
         {
-            $tagString .= '<a href="' . $tag->getUrl() . '" title="' . $tag->getTag() . '" style="' . $fontSize['style'].'"" ><span>' . e($tag->getTag()) . '</span></a>';
+            $tagString .= '<a href="' . $tag->getUrl() . '" title="' . $tag->getTag() . '" style="' . $fontSize['style'].'" ><span>' . e($tag->getTag()) . '</span></a>';
         }
         else
         {

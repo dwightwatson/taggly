@@ -8,7 +8,7 @@ Taggly is a modern port of the old CodeIgniter Taggly library by [Gavin Vickery]
 Simply add the package to your `composer.json` file and run `composer update`.
 
 ```
-"redbeed/taggly": "1.0.*"
+"tobi76/taggly": "1.5.*"
 ```
 
 If you're using Laravel, be sure to register the service provider and facade if you would like to use those.

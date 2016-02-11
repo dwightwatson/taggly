@@ -127,7 +127,7 @@ class Taggly {
 
         if (config('taggly.shuffle_tags') === false || config('taggly.shuffle_tags') === true)
         {
-            $this->setShuffleTags((bool)config('taggly.shuffleTags'));
+            $this->setShuffleTags((bool)config('taggly.shuffle_tags'));
         }
 
         if (is_array(config('taggly.html_tags')) && count(config('taggly.html_tags')) && !empty(config('taggly.html_tags')))

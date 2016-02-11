@@ -573,7 +573,6 @@ class Taggly {
     public function getTagElement(Tag $tag)
     {
         $fontSize = $this->getFontSize($tag);
-        var_dump($fontSize);
         $tagString = '';
         $endString = '';
         $attributes = '';

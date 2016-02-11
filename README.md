@@ -3,28 +3,6 @@ Taggly, a tag cloud generator
 
 Taggly is a modern port of the old CodeIgniter Taggly library by [Gavin Vickery](http://qompile.com/resources-downloads). Packaged with a service provider and facade for Laravel, this package is totally framework agnostic and will help you to generate tag clouds just like the cool kids. Note, styling the cloud is up to you!
 
-# Installation
-
-Simply add the package to your `composer.json` file and run `composer update`.
-
-```
-"redbeed/taggly": "1.0.*"
-```
-
-If you're using Laravel, be sure to register the service provider and facade if you would like to use those.
-
-Under providers:
-
-```
-'Watson\Taggly\TagglyServiceProvider',
-```
-
-And under aliases:
-
-```
-'Tag' => 'Watson\Taggly\TagFacade',
-```
-
 ## Usage
 
 First you must add the service provider to to `config/app.php` under `providers`

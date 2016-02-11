@@ -5,6 +5,11 @@
     "description": "A modern port of the old CodeIgniter Taggly library.",
     "authors": [
         {
+            "name": "Chris Woelk",
+            "email": "chris@redbeed.com",
+            "homepage": "http://www.redbeed.com",
+        },
+        {
             "name": "Dwight Watson",
             "email": "dwight@studiousapp.com"
         }

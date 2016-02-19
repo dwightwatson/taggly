@@ -5,13 +5,18 @@
     "description": "A modern port of the old CodeIgniter Taggly library.",
     "authors": [
         {
+            "name": "Chris Woelk",
+            "email": "chris@redbeed.com",
+            "homepage": "http://www.redbeed.com"
+        },
+        {
             "name": "Dwight Watson",
             "email": "dwight@studiousapp.com"
         }
     ],
     "require": {
         "php": ">=5.4.0",
-        "illuminate/support": "~4.0 || ~5.0"
+        "illuminate/support": "~4.0 || ~5.0 || ~5.1 || ~5.2"
     },
     "autoload": {
         "psr-4": {

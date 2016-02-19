@@ -576,32 +576,26 @@ class Taggly {
         $tagString = '';
         $endString = '';
         $attributes = '';
-
-        $setClass = true;
-
-   		 /* set parent html tag */
+		
+   		/* set parent html tag */
         if(isset($this->htmlTags['child']['name']) && !empty($this->htmlTags['child']['name']))
         {
-
         	/* add attributes  */
         	if(isset($this->htmlTags['child']['attributes']) && !empty($this->htmlTags['child']['attributes']))
         	{
-        		$attributes = $this->htmlTags['child']['attributes'];
-        		array_walk($attributes, function (&$value, $key) use ($fontSize) {
-        			if($key == 'class'){
-        				$setClass = false;
-        				$value .= ' '.$fontSize['class'];
-        			}
-        			$value = $key.'="'.$value.'"';
-        		});
-
-        		$attributes = implode(' ', $attributes);
+				$attributes = $this->htmlTags['child']['attributes'];
+				if (isset($attributes['class'])) {
+					$attributes['class'] .= ' '.$fontSize['class'];
+				} else {
+					$attributes['class'] = $fontSize['class'];
+				}
         	}
-
-        	if($setClass == true){
-        		$attributes .= ' class="'.$fontSize['class'].'" ';
-        	}
-
+			
+			array_walk($attributes, function(&$value, $key) {
+				$value = $key.'="'.$value.'"';
+			});
+			
+			$attributes = implode(' ', $attributes);
 
         	$tagString .= '<'.$this->htmlTags['child']['name'].' '.$attributes.'>';
         	$endString = '</'.$this->htmlTags['child']['name'].'>';
@@ -609,7 +603,7 @@ class Taggly {
 
         if ($tag->getUrl())
         {
-            $tagString .= '<a href="' . $tag->getUrl() . '" title="' . $tag->getTag() . '" style="' . $fontSize['style'].'"" ><span>' . e($tag->getTag()) . '</span></a>';
+            $tagString .= '<a href="' . $tag->getUrl() . '" title="' . $tag->getTag() . '" style="' . $fontSize['style'].'" ><span>' . e($tag->getTag()) . '</span></a>';
         }
         else
         {

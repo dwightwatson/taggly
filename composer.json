@@ -24,7 +24,7 @@
                 "Watson\\Taggly\\TagglyServiceProvider"
             ],
             "aliases": {
-                "Tag": "Watson\\Taggly\\TagFacade"
+                "Taggly": "Watson\\Taggly\\TagFacade"
             }
         }
     }

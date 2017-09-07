@@ -17,5 +17,15 @@
         "psr-4": {
             "Watson\\Taggly\\": "src/"
         }
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "Watson\\Taggly\\TagglyServiceProvider"
+            ],
+            "aliases": {
+                "Tag": "Watson\\Taggly\\TagFacade"
+            }
+        }
     }
 }
